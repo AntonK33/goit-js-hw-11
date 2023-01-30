@@ -1,7 +1,9 @@
 //import axios from 'axios';
+import { axiosRequest } from './axiosRequest';
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import easyScroll from 'easy-scroll';
 const axios = require('axios').default;
 
 const form = document.querySelector('.search-form');
@@ -13,7 +15,7 @@ const pageSize = 40;
 let currentPage = 1;
 let pagesLeft = 0;
 
-const API_KEY = "32831732-fbbeddb34dab056c70c27a61e";
+
 
 
 
@@ -45,18 +47,16 @@ return `
 `;
 }
     
-function axiosRequest(query, currentPage) {    
-    return axios.get(`https://pixabay.com/api/?key=${API_KEY}&q=${query}&per_page=${pageSize}&page=${currentPage}&image_type=photo&orientation=horizontal&safesearch=true`)    
-}
+
 async function handleSubmit(e) {
   e.preventDefault();
   downloadMore.classList.add('hidden');
-  downloadMore.classList.remove('load_more');
+  //downloadMore.classList.remove('load_more');
 
   currentPage = 1;
   query = e.currentTarget.elements.searchQuery.value;
   gallery.innerHTML = '';
-  await axiosRequest(query, currentPage).then(response => {
+  axiosRequest(query, currentPage).then(response => {
     if (query === ' ' || query === '') {
       Notiflix.Notify.failure('Please type search and try again.');
       return;
@@ -68,7 +68,18 @@ async function handleSubmit(e) {
         'Sorry, there are no images matching your search query. Please try again.'
       );
       return;
-    } else {
+    } if (pagesLeft <= 40) {
+       Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
+      gallery.insertAdjacentHTML(
+        'beforeend',
+        response.data.hits.map(picture => render(picture)).join('')
+      );
+      
+      downloadMore.classList.add('hidden');
+      return;
+    }
+    
+    else {
       Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
       gallery.insertAdjacentHTML(
         'beforeend',
@@ -76,42 +87,49 @@ async function handleSubmit(e) {
       );
       pagesLeft -= pageSize;
       downloadMore.classList.remove('hidden');
-      downloadMore.classList.add('load_more');
+      //downloadMore.classList.add('load_more');
     }
   });
   lightBox.refresh();
 }
 async function handleLoadMore() {
   currentPage += 1;
-  if (pagesLeft <= 0) {
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
-    );
-  } else {
-    await axiosRequest(query, currentPage).then(response =>
+  //if (pagesLeft <= 40) {
+     //axiosRequest(query, currentPage).then(response =>
+     // gallery.insertAdjacentHTML(
+      //  'beforeend',
+      //  response.data.hits.map(picture => render(picture)).join('')
+      //)
+    //);
+    //downloadMore.classList.add('hidden');
+    
+  //} else {
+     axiosRequest(query, currentPage).then(response =>
       gallery.insertAdjacentHTML(
         'beforeend',
         response.data.hits.map(picture => render(picture)).join('')
       )
     );
     pagesLeft -= pageSize;
+  if (pagesLeft <= 40) {
+      downloadMore.classList.add('hidden');
   }
-  lightBox.refresh();
-}
+   lightBox.refresh();
+  }
+ 
+
 
 
 const lightBox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
-
-
- //const { height: cardHeight } = document
- // .querySelector('.gallery')
- // .firstElementChild.getBoundingClientRect();
-
-//window.scrollBy({
- // top: cardHeight * 2,
- // behavior: 'smooth',
+//easyScroll({
+ //  'scrollableDomEle': window,
+//   'direction': 'bottom',
+//    'duration': 2000,
+//    'easingPreset': 'easeInQuad',
+//   'scrollAmount': 1000
 //});
+
 
