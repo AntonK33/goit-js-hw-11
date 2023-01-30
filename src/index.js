@@ -94,16 +94,6 @@ async function handleSubmit(e) {
 }
 async function handleLoadMore() {
   currentPage += 1;
-  //if (pagesLeft <= 40) {
-     //axiosRequest(query, currentPage).then(response =>
-     // gallery.insertAdjacentHTML(
-      //  'beforeend',
-      //  response.data.hits.map(picture => render(picture)).join('')
-      //)
-    //);
-    //downloadMore.classList.add('hidden');
-    
-  //} else {
      axiosRequest(query, currentPage).then(response =>
       gallery.insertAdjacentHTML(
         'beforeend',
@@ -124,12 +114,5 @@ const lightBox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
-//easyScroll({
- //  'scrollableDomEle': window,
-//   'direction': 'bottom',
-//    'duration': 2000,
-//    'easingPreset': 'easeInQuad',
-//   'scrollAmount': 1000
-//});
 
 
